@@ -16,23 +16,20 @@ const BookingSchema = new mongoose.Schema({
   date: String
 });
 
-// استخدم شرط علشان تمنع تكرار تعريف الموديل
 const Craftsman = mongoose.models.Craftsman || mongoose.model('Craftsman', CraftsmanSchema);
 const Booking = mongoose.models.Booking || mongoose.model('Booking', BookingSchema);
 
 export default async function handler(req, res) {
-  await connectToDatabase();
-
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // امسح البيانات القديمة
+    await connectToDatabase();
+
     await Craftsman.deleteMany({});
     await Booking.deleteMany({});
 
-    // أضف بيانات تجريبية
     const sampleCraftsmen = [
       {
         name: 'محمد علي',
