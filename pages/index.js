@@ -7,29 +7,50 @@ export default function Home() {
   const [bookings, setBookings] = useState([]);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
-
-  // Fetch data
-  useEffect(() => {
-    fetch('/api/craftsmen')
-      .then((r) => r.json())
-      .then((d) => Array.isArray(d) ? setCraftsmen(d) : setCraftsmen([]))
-      .catch((e) => {
-        console.error('fetch craftsmen error:', e);
-        setCraftsmen([]);
-      });
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/bookings')
-      .then((r) => r.json())
-      .then((d) => Array.isArray(d) ? setBookings(d) : setBookings([]))
-      .catch((e) => {
-        console.error('fetch bookings error:', e);
-        setBookings([]);
-      });
+    loadData();
   }, []);
 
-  // Actions
+  async function loadData() {
+    try {
+      const [craftRes, bookRes] = await Promise.all([
+        fetch('/api/craftsmen'),
+        fetch('/api/bookings'),
+      ]);
+      const [craftJson, bookJson] = await Promise.all([
+        craftRes.ok ? craftRes.json() : Promise.resolve([]),
+        bookRes.ok ? bookRes.json() : Promise.resolve([]),
+      ]);
+      setCraftsmen(Array.isArray(craftJson) ? craftJson : []);
+      setBookings(Array.isArray(bookJson) ? bookJson : []);
+    } catch (e) {
+      console.error('loadData error:', e);
+      setCraftsmen([]);
+      setBookings([]);
+    }
+  }
+
+  async function seedData() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/seed', { method: 'POST' });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        alert(data.message || 'تم تحميل البيانات');
+        await loadData();
+      } else {
+        alert(data.error || 'فشل تحميل البيانات');
+      }
+    } catch (e) {
+      console.error('seed error:', e);
+      alert('فشل تحميل البيانات');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function bookCraftsman(c) {
     try {
       const res = await fetch('/api/bookings', {
@@ -41,14 +62,16 @@ export default function Home() {
           user: 'مستخدم تجريبي',
         }),
       });
-      const nb = await res.json();
-      if (nb && (nb._id || nb.id)) {
+      const nb = await res.json().catch(() => null);
+      if (res.ok && nb) {
         setBookings((b) => [nb, ...b]);
+        alert('تم إرسال طلب الحجز إلى ' + (c?.name || 'الحرفي'));
+      } else {
+        alert('فشل إنشاء الحجز');
       }
-      alert('تم إرسال طلب الحجز إلى ' + (c?.name || 'الحرفي'));
     } catch (e) {
-      console.error('book craftsman error:', e);
-      alert('حدث خطأ أثناء إرسال طلب الحجز');
+      console.error('book error:', e);
+      alert('حدث خطأ أثناء الحجز');
     }
   }
 
@@ -67,12 +90,11 @@ export default function Home() {
         alert('فشل حذف الحرفي');
       }
     } catch (e) {
-      console.error('remove craftsman error:', e);
+      console.error('remove error:', e);
       alert('حدث خطأ أثناء الحذف');
     }
   }
 
-  // Derived
   const filtered = craftsmen.filter((c) => {
     const q = (search || '').trim();
     if (!q) return true;
@@ -83,8 +105,8 @@ export default function Home() {
     <div className="container">
       <header className="header">
         <div>
-          <h1>صنعة — Sanaa</h1>
-          <div className="small">وصل الحرفيين الموثوقين بجانبك بسهولة</div>
+          <h1>Sanaa — صنعة</h1>
+          <div className="small">وصل الحرفيين بعملائك بسهولة</div>
         </div>
         <div>
           <button
@@ -111,7 +133,7 @@ export default function Home() {
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="ابحث باسم الحرفي أو المهنة"
+                  placeholder="بحث باسم الحرفي أو المهنة"
                   style={{
                     flex: 1,
                     padding: 10,
@@ -150,27 +172,12 @@ export default function Home() {
                       <Wrench />
                     </div>
 
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: 8,
-                        alignItems: 'center',
-                        marginBottom: 8,
-                      }}
-                    >
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
                       <Star /> <strong>{c.rating ?? '-'}</strong>
                     </div>
 
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: 8,
-                        alignItems: 'center',
-                        marginBottom: 12,
-                      }}
-                    >
-                      <MapPin />{' '}
-                      <span className="small">{c.distance || '—'}</span>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+                      <MapPin /> <span className="small">{c.distance || '—'}</span>
                     </div>
 
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -209,13 +216,7 @@ export default function Home() {
                 ← رجوع
               </button>
 
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <h2 style={{ margin: 0 }}>{selected?.name}</h2>
                   <div className="small">{selected?.job}</div>
@@ -228,8 +229,7 @@ export default function Home() {
                   <Star /> <strong>{selected?.rating ?? '-'}</strong>
                 </div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <MapPin />{' '}
-                  <span className="small">{selected?.distance || '—'}</span>
+                  <MapPin /> <span className="small">{selected?.distance || '—'}</span>
                 </div>
               </div>
 
@@ -246,10 +246,7 @@ export default function Home() {
                 <button className="button" onClick={() => bookCraftsman(selected)}>
                   احجز الآن
                 </button>
-                <button
-                  className="btn-outline"
-                  onClick={() => alert('فتح دردشة (محاكاة)')}
-                >
+                <button className="btn-outline" onClick={() => alert('فتح دردشة (محاكاة)')}>
                   أرسل رسالة
                 </button>
               </div>
@@ -290,33 +287,13 @@ export default function Home() {
         <>
           <h2>لوحة تحكم المدير</h2>
 
-          {/* Seed button */}
           <div style={{ marginBottom: 12 }}>
             <button
               className="btn-outline"
-              onClick={async () => {
-                try {
-                  const r = await fetch('/api/seed', { method: 'POST' });
-                  const d = await r.json();
-                  alert(d.message || 'تم تحميل البيانات');
-                  // Refresh data after seeding
-                  const [craftRes, bookRes] = await Promise.all([
-                    fetch('/api/craftsmen'),
-                    fetch('/api/bookings'),
-                  ]);
-                  const [craftJson, bookJson] = await Promise.all([
-                    craftRes.json(),
-                    bookRes.json(),
-                  ]);
-                  setCraftsmen(Array.isArray(craftJson) ? craftJson : []);
-                  setBookings(Array.isArray(bookJson) ? bookJson : []);
-                } catch (e) {
-                  console.error('seed error:', e);
-                  alert('فشل تحميل البيانات');
-                }
-              }}
+              onClick={seedData}
+              disabled={loading}
             >
-              تحميل بيانات تجريبية
+              {loading ? 'جاري التحميل...' : 'تحميل بيانات تجريبية'}
             </button>
           </div>
 
