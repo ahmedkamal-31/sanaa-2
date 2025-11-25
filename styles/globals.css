@@ -1,0 +1,22 @@
+:root{
+  --bg:#f8fafc;
+  --card:#fff;
+  --primary:#0ea5a6;
+}
+html,body,#__next{height:100%}
+body{
+  margin:0;
+  font-family: Tahoma, Arial, sans-serif;
+  background:var(--bg);
+  direction: rtl;
+}
+.container{max-width:1000px;margin:24px auto;padding:16px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.card{background:var(--card);padding:14px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.button{background:var(--primary);color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer}
+.btn-outline{background:white;border:1px solid #ddd;padding:8px 12px;border-radius:6px;cursor:pointer}
+.table{width:100%;border-collapse:collapse}
+.table th, .table td{padding:8px;text-align:right;border-bottom:1px solid #eee}
+.small{font-size:13px;color:#666}
+.footer{text-align:center;color:#666;margin-top:16px}
