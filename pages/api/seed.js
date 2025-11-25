@@ -16,6 +16,7 @@ const BookingSchema = new mongoose.Schema({
   date: String
 });
 
+// استخدم شرط علشان تمنع تكرار تعريف الموديل
 const Craftsman = mongoose.models.Craftsman || mongoose.model('Craftsman', CraftsmanSchema);
 const Booking = mongoose.models.Booking || mongoose.model('Booking', BookingSchema);
 
@@ -27,9 +28,11 @@ export default async function handler(req, res) {
   }
 
   try {
+    // امسح البيانات القديمة
     await Craftsman.deleteMany({});
     await Booking.deleteMany({});
 
+    // أضف بيانات تجريبية
     const sampleCraftsmen = [
       {
         name: 'محمد علي',
@@ -68,6 +71,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ ok: true, message: 'تم تحميل البيانات التجريبية بنجاح' });
   } catch (error) {
+    console.error('Seed error:', error);
     return res.status(500).json({ error: 'فشل تحميل البيانات' });
   }
 }
