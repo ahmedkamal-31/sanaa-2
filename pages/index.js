@@ -8,34 +8,44 @@ export default function Home() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
 
+  // Fetch data
   useEffect(() => {
     fetch('/api/craftsmen')
       .then((r) => r.json())
-      .then((d) => setCraftsmen(d))
-      .catch((e) => console.error('fetch craftsmen error:', e));
+      .then((d) => Array.isArray(d) ? setCraftsmen(d) : setCraftsmen([]))
+      .catch((e) => {
+        console.error('fetch craftsmen error:', e);
+        setCraftsmen([]);
+      });
   }, []);
 
   useEffect(() => {
     fetch('/api/bookings')
       .then((r) => r.json())
-      .then((d) => setBookings(d))
-      .catch((e) => console.error('fetch bookings error:', e));
+      .then((d) => Array.isArray(d) ? setBookings(d) : setBookings([]))
+      .catch((e) => {
+        console.error('fetch bookings error:', e);
+        setBookings([]);
+      });
   }, []);
 
+  // Actions
   async function bookCraftsman(c) {
     try {
       const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          craftId: c._id,
-          craftName: c.name,
+          craftId: c?._id,
+          craftName: c?.name || '',
           user: 'مستخدم تجريبي',
         }),
       });
       const nb = await res.json();
-      setBookings((b) => [nb, ...b]);
-      alert('تم إرسال طلب الحجز إلى ' + c.name);
+      if (nb && (nb._id || nb.id)) {
+        setBookings((b) => [nb, ...b]);
+      }
+      alert('تم إرسال طلب الحجز إلى ' + (c?.name || 'الحرفي'));
     } catch (e) {
       console.error('book craftsman error:', e);
       alert('حدث خطأ أثناء إرسال طلب الحجز');
@@ -43,25 +53,31 @@ export default function Home() {
   }
 
   async function removeCraftsman(id) {
+    if (!id) return;
     if (!confirm('هل تريد حذف الحرفي؟')) return;
     try {
-      await fetch('/api/craftsmen', {
+      const res = await fetch('/api/craftsmen', {
         method: 'DELETE',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ id }),
       });
-      setCraftsmen((c) => c.filter((x) => x._id !== id));
+      if (res.ok) {
+        setCraftsmen((c) => c.filter((x) => x._id !== id));
+      } else {
+        alert('فشل حذف الحرفي');
+      }
     } catch (e) {
       console.error('remove craftsman error:', e);
       alert('حدث خطأ أثناء الحذف');
     }
   }
 
-  const filtered = craftsmen.filter(
-    (c) =>
-      (c.name || '').includes(search) ||
-      (c.job || '').includes(search)
-  );
+  // Derived
+  const filtered = craftsmen.filter((c) => {
+    const q = (search || '').trim();
+    if (!q) return true;
+    return (c?.name || '').includes(q) || (c?.job || '').includes(q);
+  });
 
   return (
     <div className="container">
@@ -109,6 +125,9 @@ export default function Home() {
               </div>
 
               <div className="grid">
+                {filtered.length === 0 && (
+                  <div className="small">لا توجد نتائج مطابقة الآن</div>
+                )}
                 {filtered.map((c) => (
                   <div
                     key={c._id}
@@ -130,6 +149,7 @@ export default function Home() {
                       </div>
                       <Wrench />
                     </div>
+
                     <div
                       style={{
                         display: 'flex',
@@ -138,8 +158,9 @@ export default function Home() {
                         marginBottom: 8,
                       }}
                     >
-                      <Star /> <strong>{c.rating}</strong>
+                      <Star /> <strong>{c.rating ?? '-'}</strong>
                     </div>
+
                     <div
                       style={{
                         display: 'flex',
@@ -148,8 +169,10 @@ export default function Home() {
                         marginBottom: 12,
                       }}
                     >
-                      <MapPin /> <span className="small">{c.distance}</span>
+                      <MapPin />{' '}
+                      <span className="small">{c.distance || '—'}</span>
                     </div>
+
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button
                         onClick={(e) => {
@@ -164,7 +187,7 @@ export default function Home() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          alert('فتح دردشة (محاكاة) مع ' + c.name);
+                          alert('فتح دردشة (محاكاة) مع ' + (c.name || 'الحرفي'));
                         }}
                         className="btn-outline"
                         style={{ flex: 1 }}
@@ -185,6 +208,7 @@ export default function Home() {
               >
                 ← رجوع
               </button>
+
               <div
                 style={{
                   display: 'flex',
@@ -193,39 +217,29 @@ export default function Home() {
                 }}
               >
                 <div>
-                  <h2 style={{ margin: 0 }}>{selected.name}</h2>
-                  <div className="small">{selected.job}</div>
+                  <h2 style={{ margin: 0 }}>{selected?.name}</h2>
+                  <div className="small">{selected?.job}</div>
                 </div>
                 <Wrench />
               </div>
 
               <div style={{ marginTop: 8, marginBottom: 8 }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 8,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Star /> <strong>{selected.rating}</strong>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <Star /> <strong>{selected?.rating ?? '-'}</strong>
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 8,
-                    alignItems: 'center',
-                  }}
-                >
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <MapPin />{' '}
-                  <span className="small">{selected.distance}</span>
+                  <span className="small">{selected?.distance || '—'}</span>
                 </div>
               </div>
 
               <h3>التقييمات:</h3>
               <ul className="small">
-                {(selected.reviews || []).map((r, i) => (
-                  <li key={i}>{r}</li>
-                ))}
+                {Array.isArray(selected?.reviews) && selected.reviews.length > 0 ? (
+                  selected.reviews.map((r, i) => <li key={i}>{r}</li>)
+                ) : (
+                  <li>لا توجد تقييمات بعد</li>
+                )}
               </ul>
 
               <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
@@ -275,6 +289,37 @@ export default function Home() {
       {role === 'admin' && (
         <>
           <h2>لوحة تحكم المدير</h2>
+
+          {/* Seed button */}
+          <div style={{ marginBottom: 12 }}>
+            <button
+              className="btn-outline"
+              onClick={async () => {
+                try {
+                  const r = await fetch('/api/seed', { method: 'POST' });
+                  const d = await r.json();
+                  alert(d.message || 'تم تحميل البيانات');
+                  // Refresh data after seeding
+                  const [craftRes, bookRes] = await Promise.all([
+                    fetch('/api/craftsmen'),
+                    fetch('/api/bookings'),
+                  ]);
+                  const [craftJson, bookJson] = await Promise.all([
+                    craftRes.json(),
+                    bookRes.json(),
+                  ]);
+                  setCraftsmen(Array.isArray(craftJson) ? craftJson : []);
+                  setBookings(Array.isArray(bookJson) ? bookJson : []);
+                } catch (e) {
+                  console.error('seed error:', e);
+                  alert('فشل تحميل البيانات');
+                }
+              }}
+            >
+              تحميل بيانات تجريبية
+            </button>
+          </div>
+
           <div
             style={{
               display: 'grid',
@@ -295,28 +340,34 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {craftsmen.map((c) => (
-                    <tr key={c._id}>
-                      <td>{c.name}</td>
-                      <td>{c.job}</td>
-                      <td>{c.rating}</td>
-                      <td>
-                        <button
-                          className="button"
-                          onClick={() => alert('اعتماد الحرفي ' + c._id)}
-                          style={{ marginInlineEnd: 6 }}
-                        >
-                          اعتماد
-                        </button>
-                        <button
-                          className="btn-outline"
-                          onClick={() => removeCraftsman(c._id)}
-                        >
-                          حذف
-                        </button>
-                      </td>
+                  {craftsmen.length === 0 ? (
+                    <tr>
+                      <td className="small" colSpan={4}>لا توجد بيانات للحرفيين</td>
                     </tr>
-                  ))}
+                  ) : (
+                    craftsmen.map((c) => (
+                      <tr key={c._id}>
+                        <td>{c.name}</td>
+                        <td>{c.job}</td>
+                        <td>{c.rating ?? '-'}</td>
+                        <td>
+                          <button
+                            className="button"
+                            onClick={() => alert('اعتماد الحرفي ' + c._id)}
+                            style={{ marginInlineEnd: 6 }}
+                          >
+                            اعتماد
+                          </button>
+                          <button
+                            className="btn-outline"
+                            onClick={() => removeCraftsman(c._id)}
+                          >
+                            حذف
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -356,6 +407,7 @@ export default function Home() {
           </div>
         </>
       )}
+
       <footer className="footer">© 2025 Sanaa - صنعة</footer>
     </div>
   );
