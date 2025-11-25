@@ -1,7 +1,6 @@
 import connectToDatabase from '../../lib/mongodb';
 import mongoose from 'mongoose';
 
-// تعريف الـ Schema
 const BookingSchema = new mongoose.Schema({
   craftId: String,
   craftName: String,
@@ -9,7 +8,6 @@ const BookingSchema = new mongoose.Schema({
   date: { type: String, default: () => new Date().toLocaleString() }
 });
 
-// استخدام نفس الموديل لو موجود بالفعل
 const Booking =
   mongoose.models.Booking || mongoose.model('Booking', BookingSchema);
 
