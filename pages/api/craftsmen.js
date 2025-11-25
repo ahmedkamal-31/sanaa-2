@@ -1,7 +1,6 @@
 import connectToDatabase from '../../lib/mongodb';
 import mongoose from 'mongoose';
 
-// تعريف الـ Schema
 const CraftsmanSchema = new mongoose.Schema({
   name: { type: String, required: true },
   job: { type: String, required: true },
@@ -10,7 +9,6 @@ const CraftsmanSchema = new mongoose.Schema({
   reviews: { type: [String], default: [] }
 });
 
-// استخدام نفس الموديل لو موجود بالفعل
 const Craftsman =
   mongoose.models.Craftsman || mongoose.model('Craftsman', CraftsmanSchema);
 
