@@ -385,36 +385,38 @@ export default function Home() {
         </>
       )}
 
-      
+      {/* ⭐ البوكس الذهبي — نسخة صغيرة أسفل الفوتر ⭐ */}
+      <footer className="footer">© 2026 Sanaa - صنعة</footer>
+
       <div 
         style={{
-          marginTop: 40,
+          marginTop: 10,
+          marginBottom: 20,
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <div
           style={{
             background: '#1a1a1a',
-            padding: '15px 25px',
-            borderRadius: 12,
-            border: '2px solid #DAA520',
-            boxShadow: '0 0 12px rgba(218,165,32,0.4)',
+            padding: '8px 15px',
+            borderRadius: 8,
+            border: '1px solid #DAA520',
+            boxShadow: '0 0 6px rgba(218,165,32,0.3)',
             color: '#DAA520',
             fontWeight: 'bold',
-            fontSize: 15,
+            fontSize: 12,
             textAlign: 'center',
-            maxWidth: '90%',
-            lineHeight: 1.6
+            lineHeight: 1.4,
+            opacity: 0.9
           }}
         >
-          Developed by:<br/>
-          Ahmed Kamal — Elhussein Ahmed — Hamed Salah — Hossam Ahmed
+          Developed by: Ahmed Kamal — Elhussein Ahmed —  
+          Hamed Salah — Hossam Ahmed
         </div>
       </div>
 
-      <footer className="footer">© 2026 Sanaa - صنعة</footer>
     </div>
   );
 }
