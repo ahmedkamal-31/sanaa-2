@@ -387,6 +387,9 @@ export default function Home() {
 
       <footer className="footer">© 2026 Sanaa - صنعة</footer>
     </div>
+<footer className="footer">© ahmed kamal - elhussein ahmed - hossam ahmed - hamed salah</footer>
+    </div>
   );
 }
+
 
