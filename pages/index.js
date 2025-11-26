@@ -384,12 +384,26 @@ export default function Home() {
           </div>
         </>
       )}
+      <div 
+        style={{ 
+          marginTop: 20, 
+          textAlign: 'center', 
+          fontSize: 14, 
+          color: '#555'
+        }}
+      >
+        Developed by: 
+        <strong> Ahmed Kamal </strong> - 
+        <strong> Elhussein Ahmed </strong> - 
+        <strong> Hamed Salah </strong> - 
+        <strong> Hossam Ahmed </strong>
+      </div>
 
       <footer className="footer">© 2026 Sanaa - صنعة</footer>
     </div>
-<footer className="footer">© ahmed kamal - elhussein ahmed - hossam ahmed - hamed salah</footer>
-    </div>
+
   );
 }
+
 
 
