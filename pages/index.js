@@ -150,6 +150,7 @@ export default function Home() {
                 {filtered.length === 0 && (
                   <div className="small">لا توجد نتائج مطابقة الآن</div>
                 )}
+
                 {filtered.map((c) => (
                   <div
                     key={c._id}
@@ -202,6 +203,7 @@ export default function Home() {
                         أرسل رسالة
                       </button>
                     </div>
+
                   </div>
                 ))}
               </div>
@@ -255,6 +257,7 @@ export default function Home() {
 
           <div style={{ marginTop: 16 }}>
             <h3>الحجوزات الأخيرة</h3>
+
             {bookings.length === 0 ? (
               <div className="small">لا توجد حجوزات</div>
             ) : (
@@ -271,9 +274,7 @@ export default function Home() {
                 >
                   <div>
                     <div style={{ fontWeight: 600 }}>{b.craftName}</div>
-                    <div className="small">
-                      {b.user} — {b.date}
-                    </div>
+                    <div className="small">{b.user} — {b.date}</div>
                   </div>
                   <div className="small">قيد الانتظار</div>
                 </div>
@@ -351,6 +352,7 @@ export default function Home() {
 
             <div className="card">
               <h3>إدارة الحجوزات</h3>
+
               {bookings.length === 0 ? (
                 <div className="small">لا توجد حجوزات</div>
               ) : (
@@ -369,9 +371,7 @@ export default function Home() {
                   >
                     <div>
                       <div style={{ fontWeight: 600 }}>{b.craftName}</div>
-                      <div className="small">
-                        {b.user} — {b.date}
-                      </div>
+                      <div className="small">{b.user} — {b.date}</div>
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button className="button">قبول</button>
@@ -384,26 +384,37 @@ export default function Home() {
           </div>
         </>
       )}
+
+      
       <div 
-        style={{ 
-          marginTop: 20, 
-          textAlign: 'center', 
-          fontSize: 14, 
-          color: '#555'
+        style={{
+          marginTop: 40,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
-        Developed by: 
-        <strong> Ahmed Kamal </strong> - 
-        <strong> Elhussein Ahmed </strong> - 
-        <strong> Hamed Salah </strong> - 
-        <strong> Hossam Ahmed </strong>
+        <div
+          style={{
+            background: '#1a1a1a',
+            padding: '15px 25px',
+            borderRadius: 12,
+            border: '2px solid #DAA520',
+            boxShadow: '0 0 12px rgba(218,165,32,0.4)',
+            color: '#DAA520',
+            fontWeight: 'bold',
+            fontSize: 15,
+            textAlign: 'center',
+            maxWidth: '90%',
+            lineHeight: 1.6
+          }}
+        >
+          Developed by:<br/>
+          Ahmed Kamal — Elhussein Ahmed — Hamed Salah — Hossam Ahmed
+        </div>
       </div>
 
       <footer className="footer">© 2026 Sanaa - صنعة</footer>
     </div>
-
   );
 }
-
-
-
