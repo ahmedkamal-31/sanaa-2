@@ -385,7 +385,8 @@ export default function Home() {
         </>
       )}
 
-      <footer className="footer">© 2025 Sanaa - صنعة</footer>
+      <footer className="footer">© 2026 Sanaa - صنعة</footer>
     </div>
   );
 }
+
