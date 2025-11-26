@@ -385,7 +385,6 @@ export default function Home() {
         </>
       )}
 
-      {/* ⭐ البوكس الذهبي — نسخة صغيرة أسفل الفوتر ⭐ */}
       <footer className="footer">© 2026 Sanaa - صنعة</footer>
 
       <div 
@@ -420,3 +419,4 @@ export default function Home() {
     </div>
   );
 }
+
