@@ -411,12 +411,12 @@ export default function Home() {
             opacity: 0.9
           }}
         >
-          Developed by: Ahmed Kamal — Elhussein Ahmed —  
-          Hamed Salah — Hossam Ahmed
+          Developed by:  
         </div>
       </div>
 
     </div>
   );
 }
+
 
