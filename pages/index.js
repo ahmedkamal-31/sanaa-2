@@ -411,13 +411,14 @@ export default function Home() {
             opacity: 0.9
           }}
         >
-          Developed by:  ahmed
+          Developed by:  
         </div>
       </div>
 
     </div>
   );
 }
+
 
 
 
